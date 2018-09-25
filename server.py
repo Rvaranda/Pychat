@@ -1,10 +1,13 @@
 import socket
 import threading
 import sys
+import pickle
 
 host = "127.0.0.1"
 port = 9000
 buffer_size = 4096
+
+users_online = []
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -14,7 +17,7 @@ except socket.error as e:
     print("[!!] Failed to initialize server: %s" % e)
     sys.exit()
 
-server.listen(5)
+server.listen(2)
 
 print("[*] Listening on port %d..." % port)
 
@@ -22,7 +25,11 @@ def client_handler(client, addr):
     user = client.recv(buffer_size).decode()
     print("[*] %s has connected." % user)
 
+    users_online.append(user)
+
     while True:
+        print(users_online)
+        client.send(pickle.dumps(users_online))
         data_buffer = ""
         while True:
             data = client.recv(buffer_size).decode()
@@ -36,6 +43,7 @@ def client_handler(client, addr):
             break
     
     print("[*] %s has disconnected." % user)
+    users_online.remove(user)
     client.close()
 
 

@@ -1,6 +1,7 @@
 import socket
 import threading
 import sys
+import pickle
 
 server_addr = ("127.0.0.1", 9000)
 
@@ -19,8 +20,13 @@ print("[*] Connected to the server %s on port %d." % (server_addr[0], server_add
 def main():
     username = input("Username: ")
     conn.send(username.encode())
+
     while True:
         try:
+            users_online = pickle.loads(conn.recv(4096))
+            if len(users_online) < 2:
+                print("[*] Waiting for another user...")
+                continue
             msg = input("Say: ")
             data = msg
             conn.send(data.encode())
