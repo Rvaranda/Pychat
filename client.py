@@ -17,17 +17,26 @@ except socket.error as e:
 
 print("[*] Connected to the server %s on port %d." % (server_addr[0], server_addr[1]))
 
+def receive_menssage():
+    while True:
+        msg = conn.recv(4096).decode()
+        print("Other: %s" % msg)
+
 def main():
     username = input("Username: ")
     conn.send(username.encode())
 
+    t = threading.Thread(target=receive_menssage)
+    t.start()
+
     while True:
         try:
-            users_online = pickle.loads(conn.recv(4096))
+            """users_online = pickle.loads(conn.recv(4096))
             if len(users_online) < 2:
                 print("[*] Waiting for another user...")
-                continue
-            msg = input("Say: ")
+                continue"""
+            msg = input("")
+            print("You: %s" % msg)
             data = msg
             conn.send(data.encode())
         except KeyboardInterrupt:

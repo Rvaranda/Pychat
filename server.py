@@ -8,6 +8,7 @@ port = 9000
 buffer_size = 4096
 
 users_online = []
+users_sockets = []
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -26,10 +27,12 @@ def client_handler(client, addr):
     print("[*] %s has connected." % user)
 
     users_online.append(user)
+    users_sockets.append(client)
+
+    #for conn in users_sockets:
+    #    conn.send(pickle.dumps(users_online))
 
     while True:
-        print(users_online)
-        client.send(pickle.dumps(users_online))
         data_buffer = ""
         while True:
             data = client.recv(buffer_size).decode()
@@ -39,6 +42,9 @@ def client_handler(client, addr):
         
         if not "#EXIT" in data_buffer:
             print("[==>] %s says \"%s\"" % (user, data_buffer))
+            for i in range(len(users_online)):
+                if user != users_online[i]:
+                    users_sockets[i].send(data_buffer.encode())
         else:
             break
     
